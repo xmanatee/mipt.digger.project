@@ -1,1 +1,1 @@
-# Digger
+# Digger MIPT project
