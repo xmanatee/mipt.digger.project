@@ -1,18 +1,23 @@
 import cv2
 import rectangle_builder
+import numpy as np
 
 cap = cv2.VideoCapture(u'data/CH0P0389.MPG')
 r_b = rectangle_builder.RectangleBuilder()
 
 while(cap.isOpened()):
   ret, frame = cap.read()
+  frame = cv2.resize(frame, (480, 640))
   gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
   edges = cv2.Canny(gray, 200, 300)
+  lines = cv2.HoughLinesP(edges, 0.5, 0.01, threshold=15, minLineLength=25, maxLineGap=3)
 
-  lb, rt = r_b(edges)
+  print lines.shape
 
-  cv2.rectangle(frame, lb, rt, (0, 200, 0), 2)
+  lines = lines[0]
 
+  for x1, y1, x2, y2 in lines:
+    cv2.line(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
 
   # for fr in q:
   #   for ch in fr:

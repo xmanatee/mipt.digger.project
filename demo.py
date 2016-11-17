@@ -17,6 +17,8 @@ def main():
 
   while (cap.isOpened()):
     ret, frame = cap.read()
+    # TODO(mivanov): resize is used because of constants in detector
+    frame = cv2.resize(frame, (480, 640))
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     edges = cv2.Canny(gray, 200, 300)
 
@@ -25,9 +27,17 @@ def main():
     rectangle[:] = gray
 
     cv2.rectangle(rectangle, lb, rt, (0, 200, 0), 2)
-    print detector.Detector.get_probability(edges, lb, (lb[0], rt[1]))
-    # print lb, rt
-    to_show = common.image_concat((gray, edges, rectangle, gray), (2, 2))
+    place_found = [None] * 5
+    print detector.Detector.get_probability(edges, lb, (lb[0], rt[1]), place_found)
+
+    teeth = np.empty_like(gray)
+    teeth[:] = gray
+    for pair in place_found:
+      if pair is not None:
+        cv2.rectangle(teeth, pair[0], pair[1], (0, 200, 0), 2)
+    print place_found
+    to_show = common.image_concat((teeth, edges, rectangle, gray), (2, 2))
+    # to_show = cv2.resize(to_show, (720, 405))
     cv2.imshow('demo', to_show)
 
     if cv2.waitKey(30) & 0xFF == ord('q'):

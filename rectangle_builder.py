@@ -17,7 +17,7 @@ class RectangleBuilder:
       for px in line:
         j += 1
         if px == 0:
-          if cnt_1 > 15:
+          if cnt_1 > 25:
             if len(chosen) > 0 and chosen[-1][1] > j - cnt_1 - 3:
               chosen[-1] = (chosen[-1][0], j)
             else:

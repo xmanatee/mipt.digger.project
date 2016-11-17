@@ -21,8 +21,8 @@ class Detector:
         return good_contur * 1.0 / all_contur
 
     @staticmethod
-    def get_probability(edges, p1, p2):
-        print p1, p2
+    def get_probability(edges, p1, p2, place_found=None):
+        print edges.shape
         percent_contur = [0.0, 0.0, 0.0, 0.0, 0.0]
         for num_tooth in range(5):
             for dx in range(-2, 3):
@@ -34,9 +34,13 @@ class Detector:
                                 num_tooth * (p2[1] - p1[1]) * 17.0 / 113)
                             sizex = int((p2[1] - p1[1]) * 26.0 / 113)
                             sizey = int((p2[1] - p1[1]) * 6.0 / 113)
-                            percent_contur[num_tooth] = max(percent_contur[num_tooth],
-                                    Detector.tooth_have(edges, xt + dx, yt + dy, sizex + rec_dx,
-                                            sizey + rec_dy))
+                            current_result = Detector.tooth_have(edges, xt + dx, yt + dy,
+                                    sizex + rec_dx, sizey + rec_dy)
+                            if current_result > percent_contur[num_tooth]:
+                                percent_contur[num_tooth] = current_result
+                                if place_found is not None:
+                                    place_found[num_tooth] = ((xt + dx, yt + dy),
+                                        (xt + dx + sizex + rec_dx, yt + dy + sizey + rec_dy))
         return percent_contur
 
 if __name__ == '__main__':
@@ -47,5 +51,13 @@ if __name__ == '__main__':
     p1 = (353, 246)
     p2 = (353, 359)
 
-    print Detector.get_probability(edges, p1, p2)
+    place_found = [None] * 5
+    print Detector.get_probability(edges, p1, p2, place_found)
+    print place_found
+
+    while True:
+        cv2.imshow('frame', edges)
+        if cv2.waitKey(0) & 0xFF == ord('q'):
+            break
+
     cv2.destroyAllWindows()
